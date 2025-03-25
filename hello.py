@@ -94,3 +94,55 @@ def upload_file():
     if request.method == "POST":
         file = request.files["the_file"]
         file.save(f"/var/www/uploads/{secure_filename(file.filename)}")
+
+
+
+#COOKIES
+#getting cookies
+@app.route('/')
+def index():
+    username = request.cookies.get('username')
+
+#storing cookies 
+from flask import make_response
+@app.route('/')
+def index():
+    resp = make_response(render_template(...))
+    resp.set_cookie("username","The username")
+    return resp
+
+
+#redirects and errors 
+
+from flask import abort,redirect,url_for
+
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
+
+@app.route('/login')
+def login():
+    abort(401)
+    this_is_never_executed()
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("Page_not_found.html"),404
+
+
+
+#APIS with json 
+@app.route('/me')
+def me_api():
+    user = get_current_user()
+    return {
+        "username" : user.username,
+        "theme" : user.theme,
+        "image" : url_for("user_image",filename=user.image),
+    }
+
+@app.route("/users")
+def users_api():
+    users = get_all_users()
+    return [users.to_json() for user in users]
